@@ -1,0 +1,65 @@
+
+Executing command: CCMigration_740_741,
+
+-- ******************************************************************************
+-- Add Family-Keys for new PLCs to database
+-- ******************************************************************************
+IF NOT EXISTS(SELECT 1 FROM [dbo].[CC_Prj_Data] WHERE Name = N'S7 1500 PK' )
+BEGIN
+	EXEC   [dbo].[sp_cc_Write_Prj_Data]
+				  @Name = N'S7 1500 PK',
+				  @Data = N'hFaiaZYSIhbJIcVx/xHgvvr9sdcLXUvIOQ9bDMJz7BQqA/KgTm8Vkw=='
+END
+
+SQL-Error Class(16) Line: 0State: 1 Message : Invalid object name 'dbo.CC_Prj_Data'.
+
+Executing command: CCMigration_740_741,
+IF NOT EXISTS(SELECT 1 FROM [dbo].[CC_Prj_Data] WHERE Name = N'S7 1200 PK' )
+BEGIN
+	EXEC   [dbo].[sp_cc_Write_Prj_Data]
+				  @Name = N'S7 1200 PK',
+				  @Data = N'4OHwSlyj+QFIF4aJvQyTCrnbhntPCrEJYjlZqjIxa3iA7RtPmpsYnw=='
+END
+
+SQL-Error Class(16) Line: 0State: 1 Message : Invalid object name 'dbo.CC_Prj_Data'.
+
+Executing command: CCMigration_740_741,
+IF NOT EXISTS(SELECT 1 FROM [dbo].[CC_Prj_Data] WHERE Name = N'S7 1500SIM PK' )
+BEGIN
+	EXEC   [dbo].[sp_cc_Write_Prj_Data]
+				  @Name = N'S7 1500SIM PK',
+				  @Data = N'RwDbj6JdeRwqd+7JeV1m47XyuppZUIrdUQyp/odiqggd/4Dqj3MK1MqgvKe6koksaRmEM47sIEdoHZWNxcUIag=='
+END
+
+SQL-Error Class(16) Line: 0State: 1 Message : Invalid object name 'dbo.CC_Prj_Data'.
+
+Executing command: CCMigration_740_741,
+IF NOT EXISTS(SELECT 1 FROM [dbo].[CC_Prj_Data] WHERE Name = N'WinAC PK' )
+BEGIN
+	EXEC   [dbo].[sp_cc_Write_Prj_Data]
+				  @Name = N'WinAC PK',
+				  @Data = N'X+IGtwLcKPu3QErFWIjU44fzgLBGSG2OZxUJseR1IgRzVBxPwIoUJzZeXzcQIf4S'
+END
+
+SQL-Error Class(16) Line: 0State: 1 Message : Invalid object name 'dbo.CC_Prj_Data'.
+
+Executing command: CCMigration_740_741,
+-- ******************************************************************************
+-- WinCC Classic only : Add Public-Private Key Pair for PLC-Password Encryption
+-- ******************************************************************************
+IF NOT EXISTS( SELECT 1 FROM CC_Prj_Options WHERE PrjOptKey=N'RDP.Generated' AND LongVal=1) AND
+   NOT EXISTS( SELECT 1 FROM CC_Prj_Options WHERE PrjOptKey=N'S7Plus_Key' )
+BEGIN
+  DECLARE	
+		@publicKey nvarchar(2048),
+		@privateKey nvarchar(2048)
+EXEC	[master].[dbo].[sp_cc_generatekeys]
+		@publicKey = @publicKey OUTPUT,
+		@privateKey = @privateKey OUTPUT
+EXEC   [dbo].[sp_cc_Write_Prj_Data]
+				@Name = N'S7Plus_Key',
+				@Data = @privateKey
+INSERT INTO CC_Prj_Options(PrjOptKey, LongVal, DoubleVal, StringVal) VALUES(N'S7Plus_Key', 0, 0, @publicKey)
+END
+
+SQL-Error Class(16) Line: 0State: 62 Message : Could not find stored procedure 'dbo.sp_cc_Write_Prj_Data'.
